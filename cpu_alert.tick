@@ -1,0 +1,6 @@
+stream
+	|from()
+		.measurement('cpu')
+	|alert()
+		.crit(lambda: "usage_iowait" > 50.0)
+		.log('/tmp/alerts.log')
