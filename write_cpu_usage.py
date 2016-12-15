@@ -45,12 +45,14 @@ def worker1(q):
 	the method psutil.cpu_percent(). Please visit
 	the documentation for more info in psutils.
 
-	Note: sleep(8) is being used with the value of
-	8 seconds. This is a nasty way of synchronising
+	Note: sleep(10) is being used with the value of
+	10 seconds. This is a nasty way of synchronising
 	but however it gets our job done because influxdata_python
-	agent is pusing the CPU usage at every 10 second
-	and hence it is temporarily safe to assume that
-	race condition never occurs.
+	agent is pusing the CPU usage at every 10 seconds. Race conditions 
+	never seem to occur because data is put before the data is get
+	and it gets 10 seconds to preempt the CPU and hopefully the control
+	always jumps to pushing the data part thus preventing race conditions.
+	For much more assured preemption we should use mutex locks.
 
 	:param cpu_queue: This is the queue where all the
 					  cpu percents are being stored.
