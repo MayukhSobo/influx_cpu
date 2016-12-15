@@ -1,14 +1,14 @@
 # System modules
-from Queue import Queue
-from threading import Thread
-from datetime import datetime
-from influxdb import InfluxDBClient
-import psutil
-import time
+from Queue import Queue # for data structure holding thread data
+from threading import Thread # thread library for creating thread
+from datetime import datetime # for datetime , currently not used
+from influxdb import InfluxDBClient # influxdb python agent
+import psutil  # for the cpu usage
+import time # for sleep()
 
 class DBClinet(object):
-	db_created_already = False
-	db = None
+	db_created_already = False # for checking if db is already created
+	db = None # the database object common for all the object
 	def __init__(self, host, port, user, passcode, dbname):
 		self.host = host
 		self.port = port
@@ -66,15 +66,15 @@ def worker1(q):
         #json_data = template_json.format(t=data[0], cu=data[1])
         c = DBClinet('localhost', 8086, 'root', 'mayukhsobo', 'python_cpu')
         c.create()
-	json_data[0]['fields']['cpu_usage'] = data[1]
+	json_data[0]['fields']['cpu_usage'] = data[1] # populate the cpu usage in json body
         c.write(json_data)
 	#db.write_points(json_data)
 	#print json_data
         time.sleep(10)
-	del c
+	del c  # may be not necessary
         q.task_done()
 
-
+# here is the main thread
 influxWriter = Thread(target=worker1, args=(cpu_queue,))
 influxWriter.setDaemon(True)
 influxWriter.start()
@@ -82,5 +82,5 @@ influxWriter.start()
 while True:
 	now = datetime.now()
 	t = str(now.hour) + ":" + str(now.minute) + ":" + str(now.second)
-	cpu_queue.put([t, psutil.cpu_percent(interval=1.0)])
+	cpu_queue.put([t, psutil.cpu_percent(interval=1.0)]) # data is put here in the queue
 	cpu_queue.join()
